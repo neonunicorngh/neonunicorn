@@ -35,6 +35,8 @@ def rowreplacement(matrix, target_row, source_row, j=1, k=1):
     mat = matrix.clone().float()
     mat[target_row] = j * mat[target_row] + k * mat[source_row]
     return mat
+
+
 import torch
 
 M = torch.tensor([[1,2,3],[4,5,6],[7,8,9]])

@@ -1,2 +1,2 @@
-from cvdistributions.py import secrets, float, 
-__al__ = ['secrets', 'float']
+from .cvdistributions import secrets, uniform 
+__all__ = ['secrets', 'uniform']
