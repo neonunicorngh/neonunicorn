@@ -375,3 +375,69 @@ class LinearRegression:
             }
         }
 
+np.random.seed(42)
+torch.manual_seed(42)
+
+# Load data with WSL-mounted Windows path
+data = polars.read_csv("/mnt/c/Users/fm0032/Downloads/Hydropower.csv")
+X = data["BCR"].to_numpy()
+y = data["AnnualProduction"].to_numpy()
+
+X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, test_size=0.2)
+
+# Create and fit model
+model = LinearRegression(learning_rate=0.01, max_epochs=250)
+model.fit(X_train, y_train, X_test, y_test)
+
+# Make predictions
+y_pred = model.predict(X_test)
+test_mse = float(np.mean((y_pred - y_test)**2))
+print(f"Test MSE: {test_mse:.4f}")
+
+# Print model summary
+import pprint
+pprint.pprint(model.summary())
+
+# Plot regression with confidence band
+model.plot_regression_with_confidence_band()
+plt.show()
+
+# Plot training history
+model.plot_training_history()
+plt.show()
+class CauchyRegression:
+    def __init__(self, n_features=4, c=1.0, lr=0.0001, epochs=2000):
+        self.n_features = n_features
+        self.c = c
+        self.lr = lr
+        self.epochs = epochs
+
+        import torch
+        torch.manual_seed(0)
+        self.w = torch.randn((n_features, 1), requires_grad=True)
+        self.b = torch.randn(1, requires_grad=True)
+
+    def forward(self, X):
+        return X @ self.w + self.b
+
+    def cauchy_loss(self, y_pred, y_true):
+        import torch
+        r = (y_true - y_pred) / self.c
+        return 0.5 * (self.c**2) * torch.log1p(r**2).mean()
+
+    def fit(self, X, y):
+        import torch
+        for epoch in range(1, self.epochs + 1):
+            y_pred = self.forward(X)
+            loss = self.cauchy_loss(y_pred, y)
+            loss.backward()
+            with torch.no_grad():
+                self.w -= self.lr * self.w.grad
+                self.b -= self.lr * self.b.grad
+                self.w.grad.zero_()
+                self.b.grad.zero_()
+        return loss.item()
+
+    def predict(self, X):
+        with torch.no_grad():
+            return self.forward(X)
