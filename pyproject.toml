@@ -1,6 +1,6 @@
 [project]
 name = "neonunicorn"
-version = "0.1.6"
+version = "0.2.0"
 description = "both package distribution and matrix"
 readme = "README.md"
 authors = [
